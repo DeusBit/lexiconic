@@ -93,26 +93,248 @@
                     <div class="step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h3>Configure CORS (Important)</h3>
-                            <p>To allow the Chrome extension to communicate with your local Ollama instance, you must set the <code>OLLAMA_ORIGINS</code> environment variable.</p>
+                            <h3>Configure CORS &amp; Launch Ollama</h3>
+                            <p>To allow the Chrome extension to communicate with your local Ollama instance, Ollama must be launched with the <code>OLLAMA_ORIGINS</code> environment variable. You can use our ready-to-use startup scripts or run the quick commands.</p>
                             
-                            <div class="os-tabs">
-                                <button class="os-tab active" data-target="mac">macOS / Linux</button>
-                                <button class="os-tab" data-target="windows">Windows</button>
+                            <div class="os-tabs" role="tablist">
+                                <button class="os-tab active" data-target="quick-commands">Quick Commands</button>
+                                <button class="os-tab" data-target="scripts-sh">run-ollama.sh (macOS / Linux)</button>
+                                <button class="os-tab" data-target="scripts-ps1">run-ollama.ps1 (PowerShell)</button>
+                                <button class="os-tab" data-target="scripts-bat">run-ollama.bat (Windows CMD)</button>
                             </div>
                             
-                            <div class="tab-content active" id="mac">
+                            <!-- Quick Commands Tab -->
+                            <div class="tab-content active" id="quick-commands">
+                                <div class="script-header">
+                                    <span class="script-tag">macOS / Linux (Bash / Zsh)</span>
+                                    <button class="btn-copy" data-target-code="code-cmd-mac">Copy</button>
+                                </div>
                                 <div class="code-block">
-                                    <code>export OLLAMA_ORIGINS="chrome-extension://*"<br>ollama serve</code>
+                                    <code id="code-cmd-mac">export OLLAMA_ORIGINS="chrome-extension://*"&#10;ollama serve</code>
                                 </div>
                                 <p class="note">If using the macOS app, run: <code>launchctl setenv OLLAMA_ORIGINS "chrome-extension://*"</code></p>
+                                
+                                <div class="script-header" style="margin-top: 1.25rem;">
+                                    <span class="script-tag">Windows (PowerShell)</span>
+                                    <button class="btn-copy" data-target-code="code-cmd-ps">Copy</button>
+                                </div>
+                                <div class="code-block">
+                                    <code id="code-cmd-ps">$env:OLLAMA_ORIGINS="chrome-extension://*"; ollama serve</code>
+                                </div>
+                                
+                                <div class="script-header" style="margin-top: 1.25rem;">
+                                    <span class="script-tag">Windows (Command Prompt)</span>
+                                    <button class="btn-copy" data-target-code="code-cmd-bat">Copy</button>
+                                </div>
+                                <div class="code-block">
+                                    <code id="code-cmd-bat">set OLLAMA_ORIGINS=chrome-extension://*&#10;ollama serve</code>
+                                </div>
                             </div>
                             
-                            <div class="tab-content" id="windows" style="display: none;">
-                                <div class="code-block">
-                                    <code>set OLLAMA_ORIGINS=chrome-extension://*<br>ollama serve</code>
+                            <!-- run-ollama.sh Tab -->
+                            <div class="tab-content" id="scripts-sh" style="display: none;">
+                                <div class="script-card">
+                                    <div class="script-header">
+                                        <div class="script-info">
+                                            <span class="script-name">📄 run-ollama.sh</span>
+                                            <span class="script-desc">Automated bash script with path and port checks</span>
+                                        </div>
+                                        <div class="script-actions">
+                                            <a href="run-ollama.sh" download="run-ollama.sh" class="btn-script-action">⬇ Download .sh</a>
+                                            <button class="btn-copy" data-target-code="code-run-sh">Copy Script</button>
+                                        </div>
+                                    </div>
+                                    <pre class="code-block code-scrollable"><code id="code-run-sh">#!/usr/bin/env bash
+# ==============================================================================
+# Lexiconic - Ollama Startup Script for Linux &amp; macOS
+# ==============================================================================
+# This script launches the local Ollama daemon with the necessary CORS origins
+# enabled so the Lexiconic Chrome extension can communicate with it.
+# ==============================================================================
+
+set -e
+
+# Configuration
+DEFAULT_ORIGINS="chrome-extension://*"
+export OLLAMA_ORIGINS="${OLLAMA_ORIGINS:-$DEFAULT_ORIGINS}"
+
+echo "=========================================================="
+echo " Starting Ollama for Project Lexiconic"
+echo "=========================================================="
+echo "OLLAMA_ORIGINS: ${OLLAMA_ORIGINS}"
+
+# Check if Ollama is installed
+if ! command -v ollama &gt;/dev/null 2&gt;&amp;1; then
+    echo ""
+    echo "[!] Error: 'ollama' command was not found in your PATH."
+    echo "    Please install Ollama from: https://ollama.com/download"
+    echo "=========================================================="
+    exit 1
+fi
+
+# Check if port 11434 is already in use
+PORT_IN_USE=0
+if command -v lsof &gt;/dev/null 2&gt;&amp;1; then
+    if lsof -i :11434 -sTCP:LISTEN &gt;/dev/null 2&gt;&amp;1; then
+        PORT_IN_USE=1
+    fi
+elif command -v nc &gt;/dev/null 2&gt;&amp;1; then
+    if nc -z 127.0.0.1 11434 &gt;/dev/null 2&gt;&amp;1; then
+        PORT_IN_USE=1
+    fi
+fi
+
+if [ "$PORT_IN_USE" -eq 1 ]; then
+    echo ""
+    echo "[WARNING] Port 11434 is already in use!"
+    echo "If Ollama is already running in the background (e.g. systemd or menu bar app),"
+    echo "it may lack the required OLLAMA_ORIGINS permissions for Chrome extensions."
+    echo "If Lexiconic cannot connect, stop the background Ollama service and re-run this script."
+    echo ""
+fi
+
+echo "Starting Ollama server... (Press Ctrl+C to terminate)"
+echo "=========================================================="
+exec ollama serve</code></pre>
+                                    <p class="note">Usage: <code>chmod +x run-ollama.sh &amp;&amp; ./run-ollama.sh</code></p>
                                 </div>
-                                <p class="note">PowerShell: <code>$env:OLLAMA_ORIGINS="chrome-extension://*"; ollama serve</code></p>
+                            </div>
+                            
+                            <!-- run-ollama.ps1 Tab -->
+                            <div class="tab-content" id="scripts-ps1" style="display: none;">
+                                <div class="script-card">
+                                    <div class="script-header">
+                                        <div class="script-info">
+                                            <span class="script-name">📄 run-ollama.ps1</span>
+                                            <span class="script-desc">PowerShell script with colored logging and error handling</span>
+                                        </div>
+                                        <div class="script-actions">
+                                            <a href="run-ollama.ps1" download="run-ollama.ps1" class="btn-script-action">⬇ Download .ps1</a>
+                                            <button class="btn-copy" data-target-code="code-run-ps1">Copy Script</button>
+                                        </div>
+                                    </div>
+                                    <pre class="code-block code-scrollable"><code id="code-run-ps1">&lt;#
+.SYNOPSIS
+    Starts Ollama with required parameters for the Lexiconic Chrome extension.
+
+.DESCRIPTION
+    Lexiconic requires Ollama to allow cross-origin requests from Chrome extensions.
+    This script sets OLLAMA_ORIGINS to "chrome-extension://*" and starts `ollama serve`.
+#&gt;
+
+param(
+    [string]$Origins = "chrome-extension://*"
+)
+
+$Host.UI.RawUI.WindowTitle = "Lexiconic - Ollama Service"
+
+Write-Host "==========================================================" -ForegroundColor Cyan
+Write-Host " Starting Ollama for Project Lexiconic" -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Cyan
+
+# Check if Ollama CLI is installed and accessible in PATH
+$ollamaCmd = Get-Command ollama -ErrorAction SilentlyContinue
+if (-not $ollamaCmd) {
+    Write-Host "[!] Error: 'ollama' was not found in your PATH." -ForegroundColor Red
+    Write-Host "    Please install Ollama from: https://ollama.com/download" -ForegroundColor Yellow
+    Write-Host "==========================================================" -ForegroundColor Cyan
+    exit 1
+}
+
+# Set the required environment variable
+$env:OLLAMA_ORIGINS = $Origins
+Write-Host "OLLAMA_ORIGINS: $env:OLLAMA_ORIGINS" -ForegroundColor Green
+
+# Check if port 11434 is already in use
+try {
+    $existingConn = Get-NetTCPConnection -LocalPort 11434 -State Listen -ErrorAction SilentlyContinue
+    if ($existingConn) {
+        Write-Host ""
+        Write-Host "[WARNING] Port 11434 is already in use!" -ForegroundColor Yellow
+        Write-Host "If Ollama is already running in the background (e.g. system tray app)," -ForegroundColor Yellow
+        Write-Host "it may not have OLLAMA_ORIGINS configured, which will block extension requests." -ForegroundColor Yellow
+        Write-Host "To fix: Right-click the Ollama icon in the system tray, select 'Quit Ollama'," -ForegroundColor Yellow
+        Write-Host "and then re-run this script." -ForegroundColor Yellow
+        Write-Host ""
+    }
+} catch {
+    # Non-fatal if Get-NetTCPConnection is unavailable on older PS versions
+}
+
+Write-Host "Starting Ollama server... (Press Ctrl+C to terminate)" -ForegroundColor DarkCyan
+Write-Host "==========================================================" -ForegroundColor Cyan
+
+ollama serve</code></pre>
+                                    <p class="note">Usage: Run in PowerShell <code>.\run-ollama.ps1</code></p>
+                                </div>
+                            </div>
+                            
+                            <!-- run-ollama.bat Tab -->
+                            <div class="tab-content" id="scripts-bat" style="display: none;">
+                                <div class="script-card">
+                                    <div class="script-header">
+                                        <div class="script-info">
+                                            <span class="script-name">📄 run-ollama.bat</span>
+                                            <span class="script-desc">Windows Batch launcher (supports double-click)</span>
+                                        </div>
+                                        <div class="script-actions">
+                                            <a href="run-ollama.bat" download="run-ollama.bat" class="btn-script-action">⬇ Download .bat</a>
+                                            <button class="btn-copy" data-target-code="code-run-bat">Copy Script</button>
+                                        </div>
+                                    </div>
+                                    <pre class="code-block code-scrollable"><code id="code-run-bat">@echo off
+rem ==============================================================================
+rem Lexiconic - Ollama Startup Script for Windows (Command Prompt / Double-Click)
+rem ==============================================================================
+rem Configures OLLAMA_ORIGINS to accept requests from Chrome extensions and
+rem starts `ollama serve`.
+rem ==============================================================================
+
+title Lexiconic - Ollama Service
+
+echo ==========================================================
+echo  Starting Ollama for Project Lexiconic
+echo ==========================================================
+
+rem Check if Ollama CLI exists in PATH
+where ollama &gt;nul 2&gt;nul
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [!] Error: 'ollama' command was not found in your PATH.
+    echo     Please install Ollama from: https://ollama.com/download
+    echo ==========================================================
+    pause
+    exit /b 1
+)
+
+rem Set the required environment variable
+set "OLLAMA_ORIGINS=chrome-extension://*"
+echo OLLAMA_ORIGINS: %OLLAMA_ORIGINS%
+
+rem Check if port 11434 is already listening
+netstat -ano | findstr /R /C:":11434 .*LISTENING" &gt;nul 2&gt;nul
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo [WARNING] Port 11434 is already in use!
+    echo If Ollama is already running in the background (e.g. system tray app),
+    echo it may not have OLLAMA_ORIGINS configured, which will block extension requests.
+    echo To fix: Right-click the Ollama icon in the system tray, select 'Quit Ollama',
+    echo and then re-run this script.
+    echo.
+)
+
+echo Starting Ollama server... (Press Ctrl+C to terminate)
+echo ==========================================================
+
+ollama serve
+
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [!] Ollama server stopped with an error code: %ERRORLEVEL%
+    pause
+)</code></pre>
+                                    <p class="note">Usage: Double-click <code>run-ollama.bat</code> or run from Command Prompt.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -120,14 +342,10 @@
                     <div class="step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>Pull a Supported Model</h3>
-                            <p>Lexiconic supports two high-performance models out-of-the-box:</p>
-                            <ul class="model-list">
-                                <li><strong>gemma4:e4b</strong> (Default) — Recommended for comprehensive, high-accuracy grammar checks and nuanced tone adjustments.</li>
-                                <li><strong>llama3.2:1b</strong> (Fast &amp; Lightweight) — Compact 1B model with minimal memory footprint and ultra-low latency.</li>
-                            </ul>
+                            <h3>Pull the Gemma 4 Model</h3>
+                            <p>Lexiconic is optimized for the <strong>gemma4:e4b</strong> model, providing fast, accurate, and completely private grammar and spelling checks.</p>
                             <div class="code-block">
-                                <code><span class="code-comment"># Default model:</span><br>ollama pull gemma4:e4b<br><br><span class="code-comment"># Lightweight / ultra-fast model (1B):</span><br>ollama pull llama3.2:1b</code>
+                                <code>ollama pull gemma4:e4b</code>
                             </div>
                         </div>
                     </div>
@@ -154,6 +372,27 @@
                 
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.target).style.display = 'block';
+            });
+        });
+
+        // Copy functionality with visual feedback
+        document.querySelectorAll('.btn-copy[data-target-code]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const codeEl = document.getElementById(btn.dataset.targetCode);
+                if (codeEl) {
+                    const text = codeEl.innerText || codeEl.textContent;
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalText = btn.textContent;
+                        btn.textContent = '✓ Copied!';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                }
             });
         });
 

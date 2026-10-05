@@ -14,8 +14,7 @@ const DEFAULT_TONE  = "professional";
 const DEFAULT_STYLE = "natural";
 
 const SUPPORTED_MODELS = [
-    { id: "gemma4:e4b", label: "gemma4:e4b (Default)" },
-    { id: "llama3.2:1b", label: "llama3.2:1b (Fast 1B)" }
+    { id: "gemma4:e4b", label: "gemma4:e4b (Default)" }
 ];
 
 const toneDescriptions = {

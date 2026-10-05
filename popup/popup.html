@@ -168,13 +168,12 @@
           <select id="model-select" class="input select-input" aria-label="Select Ollama model">
             <optgroup label="Supported Models (OOTB)">
               <option value="gemma4:e4b">gemma4:e4b (Default)</option>
-              <option value="llama3.2:1b">llama3.2:1b (Fast 1B)</option>
             </optgroup>
             <option value="__custom__">Custom…</option>
           </select>
         </div>
         <div class="input-group" id="custom-model-group" hidden>
-          <input type="text" id="custom-model-input" class="input" placeholder="e.g. llama3.2:1b" autocomplete="off"
+          <input type="text" id="custom-model-input" class="input" placeholder="e.g. mistral, qwen2.5:1.5b" autocomplete="off"
             spellcheck="false" aria-label="Custom model name">
         </div>
         <div class="btn-row">

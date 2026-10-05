@@ -39,8 +39,7 @@
                                            ▼
                                 ┌─────────────────────┐
                                 │ Local Ollama Daemon │
-                                │   (gemma4:e4b /     │
-                                │   llama3.2:1b)      │
+                                │    (gemma4:e4b)     │
                                 └─────────────────────┘
 ```
 
@@ -50,16 +49,10 @@
 
 1. **Google Chrome** (or any Chromium-based browser supporting Manifest V3).
 2. **[Ollama](https://ollama.com/)** installed and running locally.
-3. A fast, low-latency small language model pulled locally. Lexiconic supports two models out-of-the-box:
-   - **`gemma4:e4b`** (Default): Recommended for rich, highly accurate grammar checks and nuanced tone refinement.
-   - **`llama3.2:1b`** (Fast & Lightweight): Compact 1B model with minimal memory footprint and ultra-fast inference.
+3. A fast, low-latency small language model pulled locally (recommended: `gemma4:e4b`).
 
 ```bash
-# Pull the default Gemma 4 model:
 ollama pull gemma4:e4b
-
-# Or pull the lightweight Llama 3.2 1B model:
-ollama pull llama3.2:1b
 ```
 
 ---
@@ -132,7 +125,6 @@ You can switch models directly from the extension popup:
 2. Navigate to the **Ollama Settings** tab.
 3. Select your model from the **Model** dropdown:
    - **`gemma4:e4b` (Default)** — High accuracy and stylistic nuance.
-   - **`llama3.2:1b` (Fast 1B)** — Ultra-low latency and lightweight memory footprint.
    - Or choose **Custom…** to enter any other locally pulled Ollama model (e.g. `qwen2.5:1.5b`, `mistral`).
 4. Click **Save Model**.
 
@@ -140,7 +132,7 @@ Alternatively, the fallback default model can be configured in `background.js`:
 ```javascript
 const {
     ollamaHost   = "http://localhost:11434",
-    ollamaModel  = "gemma4:e4b", // Or "llama3.2:1b"
+    ollamaModel  = "gemma4:e4b",
     writingTone  = "professional",
     writingStyle = "natural",
 } = await chrome.storage.local.get([ ... ]);
