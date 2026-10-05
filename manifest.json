@@ -1,0 +1,51 @@
+{
+    "manifest_version": 3,
+    "name": "Lexiconic - Local Grammar & Spellcheck",
+    "version": "0.1.0",
+    "description": "Local grammar and spell checker powered by Ollama",
+    "permissions": [
+        "storage",
+        "alarms"
+    ],
+    "host_permissions": [
+        "http://localhost:*/*",
+        "http://127.0.0.1:*/*",
+        "https://localhost:*/*",
+        "https://127.0.0.1:*/*"
+    ],
+    "icons": {
+        "16": "icons/icon_x16.png",
+        "32": "icons/icon_x32.png",
+        "48": "icons/icon_x48.png",
+        "128": "icons/icon_x128.png",
+        "256": "icons/icon_x256.png"
+    },
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_title": "Lexiconic - Local AI Spellcheck",
+        "default_icon": {
+            "16": "icons/icon_x16.png",
+            "32": "icons/icon_x32.png",
+            "48": "icons/icon_x48.png",
+            "128": "icons/icon_x128.png",
+            "256": "icons/icon_x256.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lexiconic</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <!-- Header with Brand & compact Ollama Status -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">L</div>
+      <div class="brand-text">
+        <span class="brand-name">Lexiconic</span>
+        <span class="brand-tagline">Local AI Spellcheck</span>
+      </div>
+    </div>
+
+    <!-- Compact Ollama Status -->
+    <div class="header-status" id="header-status" aria-label="Ollama status">
+      <div class="status-pill" id="status-pill" title="Ollama Status">
+        <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+        <span class="status-text" id="status-text">Checking…</span>
+      </div>
+      <button class="btn-icon" id="btn-recheck" title="Recheck connection" aria-label="Recheck connection">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+        </svg>
+      </button>
+      <span class="status-detail" id="status-detail" hidden></span>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav" role="tablist" aria-label="Extension sections">
+    <button class="tab-btn active" id="tab-btn-writing" role="tab" aria-selected="true"
+      aria-controls="tab-panel-writing">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+      <span>Writing</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-ollama" role="tab" aria-selected="false" aria-controls="tab-panel-ollama">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+      <span>Ollama Settings</span>
+      <span class="tab-asterisk" id="ollama-tab-asterisk" aria-hidden="true" hidden>*</span>
+    </button>
+  </nav>
+
+  <!-- TAB 1: Writing (Writing Style & Preferences) -->
+  <div class="tab-panel" id="tab-panel-writing" role="tabpanel" aria-labelledby="tab-btn-writing">
+    <!-- Writing Style Card -->
+    <section class="card" aria-label="Writing style">
+      <div class="card-label">Writing Style</div>
+
+      <div class="pill-group-row">
+        <span class="pill-group-label">Tone</span>
+        <div class="pill-group" id="tone-pills" role="radiogroup" aria-label="Select tone">
+          <button class="pill active" data-value="professional" role="radio" aria-checked="true"
+            title="Polished, business-appropriate, and respectful">Professional</button>
+          <button class="pill" data-value="friendly" role="radio" aria-checked="false"
+            title="Warm, approachable, and conversational">Friendly</button>
+          <button class="pill" data-value="casual" role="radio" aria-checked="false"
+            title="Relaxed, informal, and conversational">Casual</button>
+          <button class="pill" data-value="formal" role="radio" aria-checked="false"
+            title="Formal, respectful, and structured">Formal</button>
+        </div>
+      </div>
+
+      <div class="pill-group-row">
+        <span class="pill-group-label">Style</span>
+        <div class="pill-group" id="style-pills" role="radiogroup" aria-label="Select writing style">
+          <button class="pill active" data-value="natural" role="radio" aria-checked="true"
+            title="Natural wording that sounds like a fluent native speaker">Natural</button>
+          <button class="pill" data-value="simple" role="radio" aria-checked="false"
+            title="Clear, straightforward language with simple sentence structures">Simple</button>
+          <button class="pill" data-value="concise" role="radio" aria-checked="false"
+            title="Brief and direct, removing unnecessary words">Concise</button>
+          <button class="pill" data-value="polished" role="radio" aria-checked="false"
+            title="Refined and well-structured while preserving the author's voice">Polished</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preferences Card -->
+    <section class="card" aria-label="Preferences">
+      <div class="card-label">Preferences</div>
+      <div class="toggle-row">
+        <label class="toggle-info" for="auto-check-toggle">
+          <span class="toggle-label">Auto spell check</span>
+          <span class="toggle-status-badge off" id="auto-check-status-badge">Disabled &bull; Manual check on
+            click</span>
+        </label>
+        <label class="switch" for="auto-check-toggle">
+          <input type="checkbox" id="auto-check-toggle" aria-label="Toggle auto spell check">
+          <span class="switch-slider" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      <div class="pref-desc-box" role="region" aria-label="Auto check explanation">
+        <div class="pref-desc-item" id="desc-mode-on">
+          <span class="desc-bullet on" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </span>
+          <div class="desc-text">
+            <strong>Selected (ON):</strong> Automatically analyzes spelling and grammar 1 second after you pause typing.
+            Underlines issues and displays suggestions in real time.
+          </div>
+        </div>
+
+        <div class="pref-desc-item is-active" id="desc-mode-off">
+          <span class="desc-bullet off" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+          </span>
+          <div class="desc-text">
+            <strong>Unselected (OFF):</strong> Saves local CPU/GPU resources. Background checks are paused; click the
+            floating yellow extension badge on any text box to check manually on demand.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- TAB 2: Ollama Settings (Static Connector Config with Host, Model, and Collapsible Setup Guide) -->
+  <div class="tab-panel" id="tab-panel-ollama" role="tabpanel" aria-labelledby="tab-btn-ollama" hidden>
+    <!-- Ollama Connector Configuration (Static Card) -->
+    <section class="card" id="connector-card" aria-label="Ollama connector configuration">
+      <div class="card-label">Ollama connector configuration</div>
+
+      <!-- Static Section: Ollama Host -->
+      <div class="connector-field-group">
+        <label class="field-label" for="host-input">Ollama Host</label>
+        <div class="input-group">
+          <input type="url" id="host-input" class="input" placeholder="http://localhost:11434" autocomplete="off"
+            spellcheck="false" aria-label="Ollama host URL">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="btn-reset" aria-label="Reset to default host">Reset</button>
+          <button class="btn btn-primary" id="btn-save" aria-label="Save host and recheck">Save &amp; Test</button>
+        </div>
+      </div>
+
+      <div class="connector-divider"></div>
+
+      <!-- Static Section: Model -->
+      <div class="connector-field-group">
+        <label class="field-label" for="model-select">Model</label>
+        <div class="input-group">
+          <select id="model-select" class="input select-input" aria-label="Select Ollama model">
+            <option value="" disabled>Connect to list available models</option>
+          </select>
+        </div>
+        <div class="input-group" id="custom-model-group" hidden>
+          <input type="text" id="custom-model-input" class="input" placeholder="e.g. llama3.2:1b" autocomplete="off"
+            spellcheck="false" aria-label="Custom model name">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="btn-reset-model" aria-label="Reset to default model">Reset</button>
+          <button class="btn btn-primary" id="btn-save-model" aria-label="Save model selection">Save Model</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Setup Guide Section -->
+    <section class="card collapsible-card is-collapsed" id="setup-guide-card" aria-label="Setup guide">
+      <button type="button" class="collapsible-header-btn" id="setup-guide-toggle-btn" aria-expanded="false"
+        aria-controls="setup-guide-body">
+        <div class="collapsible-title-group">
+          <span class="collapsible-heading">Setup Guide</span>
+          <span class="badge-pill">CORS / Permissions</span>
+        </div>
+        <svg class="chevron-icon" id="setup-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
+      <div class="collapsible-body" id="setup-guide-body" hidden>
+        <p class="onboarding-desc">
+          Ollama requires CORS permission to allow browser extensions to communicate with it.
+        </p>
+
+        <!-- Extension ID pre-filling info -->
+        <div class="ext-id-box">
+          <div class="ext-id-label">Your Extension ID:</div>
+          <div class="ext-id-row">
+            <code id="ext-id-val" class="code-pill">detecting…</code>
+            <button class="btn-copy-mini" id="btn-copy-id" title="Copy Extension ID" aria-label="Copy Extension ID">
+              Copy ID
+            </button>
+          </div>
+        </div>
+
+        <!-- OS Selection Tabs -->
+        <div class="os-tabs" role="tablist">
+          <button class="os-tab active" data-os="mac" role="tab" aria-selected="true">macOS / Linux</button>
+          <button class="os-tab" data-os="win-ps" role="tab" aria-selected="false">Windows (PowerShell)</button>
+          <button class="os-tab" data-os="win-cmd" role="tab" aria-selected="false">Windows (CMD)</button>
+        </div>
+
+        <!-- Command Snippet Box with 1-click copy -->
+        <div class="command-box">
+          <div class="command-code-wrap">
+            <code id="command-text" class="command-code">OLLAMA_ORIGINS="chrome-extension://*" ollama serve</code>
+          </div>
+          <button class="btn-copy-cmd" id="btn-copy-cmd" aria-label="Copy startup command">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copy-cmd-label">Copy Command</span>
+          </button>
+        </div>
+
+        <!-- Toggle specific vs wildcard ID mode -->
+        <div class="id-toggle-row">
+          <label class="toggle-sub">
+            <input type="checkbox" id="use-specific-origin-toggle">
+            <span>Lock to this Extension ID only (recommended for security)</span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span id="version-label">v1.0</span>
+    <a href="https://ollama.com" target="_blank" rel="noopener" id="ollama-link">ollama.com ↗</a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
