@@ -98,7 +98,11 @@
                         <div class="step-number">1</div>
                         <div class="step-content">
                             <h3>Install Ollama</h3>
-                            <p>Download and install Ollama from <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">ollama.com</a>.</p>
+                            <p>Download and install Ollama from the official website at <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">ollama.com</a>. Ollama is free, open source, and runs locally on macOS, Windows, and Linux.</p>
+                            <p>Visit <a href="https://ollama.com/download" target="_blank" rel="noopener noreferrer">ollama.com/download</a> to get the installer for your operating system, or install via terminal on Linux:</p>
+                            <div class="code-block">
+                                <code>curl -fsSL https://ollama.com/install.sh | sh</code>
+                            </div>
                         </div>
                     </div>
                     
@@ -124,6 +128,7 @@
                                 <div class="code-block">
                                     <code>set OLLAMA_ORIGINS=chrome-extension://*<br>ollama serve</code>
                                 </div>
+                                <p class="note">PowerShell: <code>$env:OLLAMA_ORIGINS="chrome-extension://*"; ollama serve</code></p>
                             </div>
                         </div>
                     </div>
@@ -131,10 +136,10 @@
                     <div class="step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>Pull a Model</h3>
-                            <p>We recommend a fast, capable model like Llama 3 or Mistral.</p>
+                            <h3>Pull the Gemma 4 Model</h3>
+                            <p>Lexiconic is optimized for the <strong>gemma4:e4b</strong> model, providing fast, accurate, and completely private grammar and spelling checks.</p>
                             <div class="code-block">
-                                <code>ollama pull llama3</code>
+                                <code>ollama pull gemma4:e4b</code>
                             </div>
                         </div>
                     </div>
