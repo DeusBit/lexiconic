@@ -4,14 +4,13 @@
     "version": "0.1.0",
     "description": "Local grammar and spell checker powered by Ollama",
     "permissions": [
-        "storage",
-        "alarms"
+        "storage"
     ],
     "host_permissions": [
-        "http://localhost:*/*",
-        "http://127.0.0.1:*/*",
-        "https://localhost:*/*",
-        "https://127.0.0.1:*/*"
+        "http://localhost:11434/*",
+        "http://127.0.0.1:11434/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
     ],
     "icons": {
         "16": "icons/icon_x16.png",
