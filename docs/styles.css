@@ -137,6 +137,24 @@ a:hover {
     border-radius: 8px;
 }
 
+.brand-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(213, 167, 84, 0.35));
+    transition: transform var(--transition);
+}
+
+.logo:hover .brand-logo {
+    transform: scale(1.08) rotate(-3deg);
+}
+
+.brand-logo.small {
+    width: 28px;
+    height: 28px;
+}
+
 .brand-text {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
@@ -623,6 +641,44 @@ footer {
     font-size: 1.1rem;
 }
 
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.footer-github {
+    color: var(--lex-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: color var(--transition);
+}
+
+.footer-github:hover {
+    color: var(--lex-text-primary);
+}
+
+.nav-github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.github-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.btn-github-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 footer p {
     color: var(--lex-text-muted);
     font-size: 0.9rem;
@@ -675,6 +731,12 @@ footer p {
         flex-wrap: wrap;
     }
     
+    .footer-content {
+        flex-direction: column;
+        gap: 1.25rem;
+        text-align: center;
+    }
+
     .nav-links {
         display: none;
     }
