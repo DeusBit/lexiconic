@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexiconic - The Offline Grammar Assistant</title>
+    <meta name="description" content="Lexiconic is a powerful, offline-first Chrome extension that brings privacy-focused grammar correction right to your browser using Ollama.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+    
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <div class="brand-icon">Lx</div>
+                <span class="brand-text">Lexiconic</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#setup">Ollama Setup</a></li>
+                <li><a href="#download" class="btn btn-primary">Get Extension</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div class="badge">Privacy First Grammar AI</div>
+                <h1>Perfect your writing,<br>protect your <span class="highlight">privacy.</span></h1>
+                <p>Lexiconic runs completely offline using local LLMs via Ollama. Get real-time grammar suggestions in Gmail and beyond, without ever sending your keystrokes to the cloud.</p>
+                <div class="hero-actions">
+                    <a href="#setup" class="btn btn-primary btn-lg">Setup Guide</a>
+                    <a href="#features" class="btn btn-secondary btn-lg">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="browser-mockup">
+                    <div class="browser-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
+                    <div class="browser-body">
+                        <div class="mockup-content">
+                            <p>Their are many reasons why this is a great idea.</p>
+                            <div class="popover">
+                                <span class="popover-badge">Lexiconic</span>
+                                <strong>There</strong> are many reasons...
+                                <div class="popover-actions">
+                                    <button class="btn-micro">Apply Fix</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Why Lexiconic?</h2>
+            <div class="grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Private</h3>
+                    <p>Your text never leaves your device. Lexiconic connects locally to your Ollama instance, ensuring complete data privacy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Powered by optimized local models, Lexiconic delivers instant grammar and spelling corrections as you type.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✉️</div>
+                    <h3>Gmail Optimized</h3>
+                    <p>Designed specifically to work flawlessly with Gmail's rich text editor, preserving your formatting and signatures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="setup" class="setup-section">
+        <div class="container">
+            <div class="setup-card">
+                <h2>Ollama Configuration</h2>
+                <p class="setup-subtitle">To keep your data private, Lexiconic requires a local instance of Ollama running a compatible model.</p>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Install Ollama</h3>
+                            <p>Download and install Ollama from the official website at <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">ollama.com</a>. Ollama is free, open source, and runs locally on macOS, Windows, and Linux.</p>
+                            <p>Visit <a href="https://ollama.com/download" target="_blank" rel="noopener noreferrer">ollama.com/download</a> to get the installer for your operating system, or install via terminal on Linux:</p>
+                            <div class="code-block">
+                                <code>curl -fsSL https://ollama.com/install.sh | sh</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Configure CORS (Important)</h3>
+                            <p>To allow the Chrome extension to communicate with your local Ollama instance, you must set the <code>OLLAMA_ORIGINS</code> environment variable.</p>
+                            
+                            <div class="os-tabs">
+                                <button class="os-tab active" data-target="mac">macOS / Linux</button>
+                                <button class="os-tab" data-target="windows">Windows</button>
+                            </div>
+                            
+                            <div class="tab-content active" id="mac">
+                                <div class="code-block">
+                                    <code>export OLLAMA_ORIGINS="chrome-extension://*"<br>ollama serve</code>
+                                </div>
+                                <p class="note">If using the macOS app, run: <code>launchctl setenv OLLAMA_ORIGINS "chrome-extension://*"</code></p>
+                            </div>
+                            
+                            <div class="tab-content" id="windows" style="display: none;">
+                                <div class="code-block">
+                                    <code>set OLLAMA_ORIGINS=chrome-extension://*<br>ollama serve</code>
+                                </div>
+                                <p class="note">PowerShell: <code>$env:OLLAMA_ORIGINS="chrome-extension://*"; ollama serve</code></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Pull the Gemma 4 Model</h3>
+                            <p>Lexiconic is optimized for the <strong>gemma4:e4b</strong> model, providing fast, accurate, and completely private grammar and spelling checks.</p>
+                            <div class="code-block">
+                                <code>ollama pull gemma4:e4b</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="brand-icon small">Lx</div>
+                <span>Lexiconic</span>
+            </div>
+            <p>&copy; 2026 Lexiconic. Built for privacy-first productivity.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.os-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.target).style.display = 'block';
+            });
+        });
+
+        // Add intersection observer for reveal animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .step').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
