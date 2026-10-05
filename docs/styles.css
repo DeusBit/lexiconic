@@ -425,6 +425,25 @@ a:hover {
     margin-bottom: 1rem;
 }
 
+.model-list {
+    margin: 0 0 1.25rem 1.25rem;
+    color: var(--lex-text-muted);
+    font-size: 0.95rem;
+}
+
+.model-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.model-list strong {
+    color: var(--lex-text-primary);
+}
+
+.code-comment {
+    color: #A8A095;
+}
+
 .code-block {
     background: #2D2A26;
     color: #F8F5EF;

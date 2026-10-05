@@ -1,6 +1,6 @@
 {
   "name": "lexiconic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Privacy-first, locally hosted spell and grammar checking Chrome extension powered by Ollama",
   "private": true,
   "scripts": {

@@ -292,9 +292,17 @@ body {
   cursor: not-allowed;
 }
 
-.select-input option {
+.select-input option,
+.select-input optgroup {
   background: #FFFFFF;
   color: var(--text-primary);
+  font-family: inherit;
+}
+
+.select-input optgroup {
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 /* ── Buttons ──────────────────────────────────────────────── */

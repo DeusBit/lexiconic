@@ -11,6 +11,7 @@ Lexiconic is a privacy-first, locally hosted spell and grammar checking Chrome e
 Features:
 - Instant grammar and spell checks on any webpage
 - Fully local and private analysis using Ollama models
+- Out-of-the-box support for Gemma 4 (gemma4:e4b) and lightweight Llama 3.2 1B (llama3.2:1b)
 - Customize tone (e.g. professional, casual, friendly) and style (e.g. natural, concise)
 - Fix issues individually or apply all corrections with one click
 - Operates offline and guarantees complete data privacy
@@ -18,6 +19,7 @@ Features:
 **Search Terms:** spellcheck, grammar, local ai, privacy, writing assistant
 
 ## Version History
+- **v0.1.1** (2026-10-05): Added out-of-the-box support for Llama 3.2 1B (`llama3.2:1b`) alongside Gemma 4 (`gemma4:e4b`), updated popup model selector, and refined setup guides.
 - **v0.1.0** (2026-10-05): Initial release.
 
 ## Privacy & Data Use

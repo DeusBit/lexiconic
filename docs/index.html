@@ -120,10 +120,14 @@
                     <div class="step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>Pull the Gemma 4 Model</h3>
-                            <p>Lexiconic is optimized for the <strong>gemma4:e4b</strong> model, providing fast, accurate, and completely private grammar and spelling checks.</p>
+                            <h3>Pull a Supported Model</h3>
+                            <p>Lexiconic supports two high-performance models out-of-the-box:</p>
+                            <ul class="model-list">
+                                <li><strong>gemma4:e4b</strong> (Default) — Recommended for comprehensive, high-accuracy grammar checks and nuanced tone adjustments.</li>
+                                <li><strong>llama3.2:1b</strong> (Fast &amp; Lightweight) — Compact 1B model with minimal memory footprint and ultra-low latency.</li>
+                            </ul>
                             <div class="code-block">
-                                <code>ollama pull gemma4:e4b</code>
+                                <code><span class="code-comment"># Default model:</span><br>ollama pull gemma4:e4b<br><br><span class="code-comment"># Lightweight / ultra-fast model (1B):</span><br>ollama pull llama3.2:1b</code>
                             </div>
                         </div>
                     </div>

@@ -50,10 +50,16 @@
 
 1. **Google Chrome** (or any Chromium-based browser supporting Manifest V3).
 2. **[Ollama](https://ollama.com/)** installed and running locally.
-3. A fast, low-latency small language model pulled locally (recommended: `gemma4:e4b` or `llama3.2:1b`).
+3. A fast, low-latency small language model pulled locally. Lexiconic supports two models out-of-the-box:
+   - **`gemma4:e4b`** (Default): Recommended for rich, highly accurate grammar checks and nuanced tone refinement.
+   - **`llama3.2:1b`** (Fast & Lightweight): Compact 1B model with minimal memory footprint and ultra-fast inference.
 
 ```bash
+# Pull the default Gemma 4 model:
 ollama pull gemma4:e4b
+
+# Or pull the lightweight Llama 3.2 1B model:
+ollama pull llama3.2:1b
 ```
 
 ---
@@ -121,18 +127,23 @@ project-lexiconic/
 ## Configuration & Tuning
 
 ### Changing the Model
-To balance speed and accuracy, you can edit the model parameter in `background.js`:
+You can switch models directly from the extension popup:
+1. Click the **Lexiconic** extension icon in Chrome.
+2. Navigate to the **Ollama Settings** tab.
+3. Select your model from the **Model** dropdown:
+   - **`gemma4:e4b` (Default)** — High accuracy and stylistic nuance.
+   - **`llama3.2:1b` (Fast 1B)** — Ultra-low latency and lightweight memory footprint.
+   - Or choose **Custom…** to enter any other locally pulled Ollama model (e.g. `qwen2.5:1.5b`, `mistral`).
+4. Click **Save Model**.
 
+Alternatively, the fallback default model can be configured in `background.js`:
 ```javascript
-body: JSON.stringify({
-  model: "gemma4:e4b", // Change to "llama3.2:1b", "qwen2.5:1.5b", etc.
-  prompt: prompt,
-  stream: false,
-  format: "json",
-  options: {
-    temperature: 0.0 // Low temperature for deterministic corrections
-  }
-})
+const {
+    ollamaHost   = "http://localhost:11434",
+    ollamaModel  = "gemma4:e4b", // Or "llama3.2:1b"
+    writingTone  = "professional",
+    writingStyle = "natural",
+} = await chrome.storage.local.get([ ... ]);
 ```
 
 ### Adjusting Debounce Delay

@@ -166,7 +166,11 @@
         <label class="field-label" for="model-select">Model</label>
         <div class="input-group">
           <select id="model-select" class="input select-input" aria-label="Select Ollama model">
-            <option value="" disabled>Connect to list available models</option>
+            <optgroup label="Supported Models (OOTB)">
+              <option value="gemma4:e4b">gemma4:e4b (Default)</option>
+              <option value="llama3.2:1b">llama3.2:1b (Fast 1B)</option>
+            </optgroup>
+            <option value="__custom__">Custom…</option>
           </select>
         </div>
         <div class="input-group" id="custom-model-group" hidden>
@@ -245,7 +249,7 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <span id="version-label">v1.0</span>
+    <span id="version-label">v0.1.1</span>
     <a href="https://ollama.com" target="_blank" rel="noopener" id="ollama-link">ollama.com ↗</a>
   </footer>
 

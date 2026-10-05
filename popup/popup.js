@@ -13,6 +13,11 @@ const CUSTOM_VALUE  = "__custom__";
 const DEFAULT_TONE  = "professional";
 const DEFAULT_STYLE = "natural";
 
+const SUPPORTED_MODELS = [
+    { id: "gemma4:e4b", label: "gemma4:e4b (Default)" },
+    { id: "llama3.2:1b", label: "llama3.2:1b (Fast 1B)" }
+];
+
 const toneDescriptions = {
   neutral: "Neutral and objective",
   friendly: "Warm, approachable, and conversational",
@@ -170,6 +175,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { writingStyle = DEFAULT_STYLE } = await chrome.storage.local.get("writingStyle");
     setPillGroupActive(tonePills, writingTone);
     setPillGroupActive(stylePills, writingStyle);
+
+    // Initial model options setup
+    await setModelSelectOffline();
 
     // Check connection (this will also populate the model list on success)
     await checkConnection(ollamaHost);
@@ -435,37 +443,55 @@ async function checkConnection(host) {
 async function populateModelSelect(models) {
     const { ollamaModel = DEFAULT_MODEL } = await chrome.storage.local.get("ollamaModel");
 
-    // Build option list: available models + separator + Custom option
     modelSelect.innerHTML = "";
 
-    const modelNames = models.map((m) => m.name);
-
-    // Ensure the saved model is always in the list even if not pulled locally
-    const allModelNames = modelNames.includes(ollamaModel)
-        ? modelNames
-        : [ollamaModel, ...modelNames];
-
-    for (const name of allModelNames) {
+    // 1. Supported out-of-the-box models
+    const supportedOptGroup = document.createElement("optgroup");
+    supportedOptGroup.label = "Supported Models (OOTB)";
+    for (const sm of SUPPORTED_MODELS) {
         const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name === DEFAULT_MODEL ? `${name} (default)` : name;
-        modelSelect.appendChild(opt);
+        opt.value = sm.id;
+        const isPulled = models.some((m) => m.name === sm.id || m.name.startsWith(sm.id.split(":")[0]));
+        opt.textContent = isPulled ? `${sm.label} ✓` : sm.label;
+        supportedOptGroup.appendChild(opt);
+    }
+    modelSelect.appendChild(supportedOptGroup);
+
+    // 2. Other local models detected in Ollama
+    const supportedIds = SUPPORTED_MODELS.map((m) => m.id);
+    const otherModels = models.filter((m) => !supportedIds.includes(m.name));
+    if (otherModels.length > 0) {
+        const otherGroup = document.createElement("optgroup");
+        otherGroup.label = "Other Local Models";
+        for (const m of otherModels) {
+            const opt = document.createElement("option");
+            opt.value = m.name;
+            opt.textContent = m.name;
+            otherGroup.appendChild(opt);
+        }
+        modelSelect.appendChild(otherGroup);
     }
 
-    // Separator
-    const sep = document.createElement("option");
-    sep.disabled = true;
-    sep.textContent = "──────────";
-    modelSelect.appendChild(sep);
+    // 3. User's saved model if not already in the list
+    const allKnown = [...supportedIds, ...models.map((m) => m.name)];
+    if (!allKnown.includes(ollamaModel) && ollamaModel !== CUSTOM_VALUE) {
+        const customSavedGroup = document.createElement("optgroup");
+        customSavedGroup.label = "Active Model";
+        const opt = document.createElement("option");
+        opt.value = ollamaModel;
+        opt.textContent = `${ollamaModel} (saved)`;
+        customSavedGroup.appendChild(opt);
+        modelSelect.appendChild(customSavedGroup);
+    }
 
-    // Custom entry option
+    // 4. Custom entry option
     const customOpt = document.createElement("option");
     customOpt.value = CUSTOM_VALUE;
     customOpt.textContent = "Custom…";
     modelSelect.appendChild(customOpt);
 
     // Restore selection
-    if (allModelNames.includes(ollamaModel)) {
+    if ([...modelSelect.options].some((o) => o.value === ollamaModel)) {
         modelSelect.value = ollamaModel;
         customModelGroup.hidden = true;
     } else {
@@ -477,24 +503,46 @@ async function populateModelSelect(models) {
     modelSelect.disabled = false;
 }
 
-/** Called when Ollama is unreachable — show a read-only offline placeholder. */
+/** Called when Ollama is unreachable — show supported models and saved selection. */
 async function setModelSelectOffline() {
     const { ollamaModel = DEFAULT_MODEL } = await chrome.storage.local.get("ollamaModel");
 
     modelSelect.innerHTML = "";
 
-    const savedOpt = document.createElement("option");
-    savedOpt.value = ollamaModel;
-    savedOpt.textContent = `${ollamaModel} (saved)`;
-    modelSelect.appendChild(savedOpt);
+    const supportedGroup = document.createElement("optgroup");
+    supportedGroup.label = "Supported Models (OOTB)";
+    for (const sm of SUPPORTED_MODELS) {
+        const opt = document.createElement("option");
+        opt.value = sm.id;
+        opt.textContent = sm.label;
+        supportedGroup.appendChild(opt);
+    }
+    modelSelect.appendChild(supportedGroup);
+
+    if (!SUPPORTED_MODELS.some((m) => m.id === ollamaModel) && ollamaModel !== CUSTOM_VALUE) {
+        const savedGroup = document.createElement("optgroup");
+        savedGroup.label = "Active Model";
+        const opt = document.createElement("option");
+        opt.value = ollamaModel;
+        opt.textContent = `${ollamaModel} (saved)`;
+        savedGroup.appendChild(opt);
+        modelSelect.appendChild(savedGroup);
+    }
 
     const customOpt = document.createElement("option");
     customOpt.value = CUSTOM_VALUE;
     customOpt.textContent = "Custom…";
     modelSelect.appendChild(customOpt);
 
-    modelSelect.value = ollamaModel;
-    customModelGroup.hidden = true;
+    if ([...modelSelect.options].some((o) => o.value === ollamaModel)) {
+        modelSelect.value = ollamaModel;
+        customModelGroup.hidden = true;
+    } else {
+        modelSelect.value = CUSTOM_VALUE;
+        customModelInput.value = ollamaModel;
+        customModelGroup.hidden = false;
+    }
+
     modelSelect.disabled = false;
 }
 
