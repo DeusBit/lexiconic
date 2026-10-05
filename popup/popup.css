@@ -377,7 +377,10 @@ body {
   transition: color var(--transition);
 }
 
-.footer a:hover { color: var(--accent-from); }
+.footer a:hover {
+  color: var(--accent-from);
+  text-decoration: underline;
+}
 
 /* ── Onboarding / CORS Setup Guide (Collapsible) ──────────── */
 .onboarding-card {

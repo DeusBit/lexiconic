@@ -1,8 +1,9 @@
 # Lexiconic — Project Structure & Architecture Guide
 
 > **Audience:** AI Agents & Developers  
-> **Last Updated:** October 2026 (v0.1.1)  
-> **Repository:** [https://github.com/DeusBit/lexiconic](https://github.com/DeusBit/lexiconic)
+> **Last Updated:** October 2026 (v0.1.2)  
+> **Repository:** [https://github.com/DeusBit/lexiconic](https://github.com/DeusBit/lexiconic)  
+> **Home Page:** [https://deusbit.github.io/lexiconic/](https://deusbit.github.io/lexiconic/)
 
 ---
 

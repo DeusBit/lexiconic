@@ -2,6 +2,8 @@
 
 **Project Lexiconic** is a privacy-first, locally hosted spell and grammar checking Chrome extension. Powered by local large language models via [Ollama](https://ollama.com/), Lexiconic inspects browser input fields (such as textareas, text inputs, and `contenteditable` elements) and delivers real-time correction suggestions—without your keystrokes or data ever leaving your machine.
 
+🌐 **Website & Documentation:** [https://deusbit.github.io/lexiconic/](https://deusbit.github.io/lexiconic/)
+
 ---
 
 ## Features
