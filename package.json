@@ -3,6 +3,7 @@
   "version": "0.1.2",
   "description": "Privacy-first, locally hosted spell and grammar checking Chrome extension powered by Ollama",
   "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "build":   "node scripts/build.js",
     "pack":    "node scripts/build.js && node scripts/pack.js",
