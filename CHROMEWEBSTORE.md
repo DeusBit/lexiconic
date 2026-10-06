@@ -19,6 +19,7 @@ Features:
 **Search Terms:** spellcheck, grammar, local ai, privacy, writing assistant
 
 ## Version History
+- **v0.1.3** (2026-10-06): Added overlay canvas for in-line red squiggly underlines on text offsets, and added tone and style quick-select dropdowns to the suggestion popup header for instant configuration.
 - **v0.1.2** (2026-10-05): Added GitHub releases navigation, documentation links, and improved UI styling.
 - **v0.1.1** (2026-10-05): Updated popup model selector, refined setup guides and offline mode.
 - **v0.1.0** (2026-10-05): Initial release.

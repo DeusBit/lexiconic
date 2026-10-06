@@ -13,6 +13,9 @@
     let popupElement = null;
     let resizeObserver = null;
 
+    let overlayCanvas = null;
+    let overlayCtx = null;
+
     // State cache for the currently active element
     let currentCheckState = {
         lastCheckedText: "",
@@ -325,6 +328,233 @@
         setElementText(el, newText);
     }
 
+    /* ── Canvas Overlay & Bounding Boxes ────────────────────── */
+
+    const mirrorProperties = [
+        "direction", "boxSizing", "width", "height", "overflowX", "overflowY",
+        "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth", "borderStyle",
+        "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+        "fontStyle", "fontVariant", "fontWeight", "fontStretch", "fontSize", "fontSizeAdjust", "lineHeight", "fontFamily",
+        "textAlign", "textTransform", "textIndent", "textDecoration", "letterSpacing", "wordSpacing",
+        "tabSize", "MozTabSize"
+    ];
+    let mirrorDiv = null;
+
+    function getCaretCoordinates(element, position) {
+        if (!mirrorDiv) {
+            mirrorDiv = document.createElement("div");
+            document.body.appendChild(mirrorDiv);
+        }
+        const style = window.getComputedStyle(element);
+        mirrorDiv.style.cssText = "position: absolute; visibility: hidden; white-space: pre-wrap; word-wrap: break-word; top: 0; left: 0;";
+        
+        mirrorProperties.forEach(prop => {
+            mirrorDiv.style[prop] = style[prop];
+        });
+        
+        mirrorDiv.textContent = element.value.substring(0, position);
+        const span = document.createElement("span");
+        span.textContent = element.value.substring(position, position + 1) || ".";
+        mirrorDiv.appendChild(span);
+        
+        return {
+            top: span.offsetTop,
+            left: span.offsetLeft,
+            height: span.offsetHeight
+        };
+    }
+
+    function getRangesForContentEditable(rootEl, original) {
+        const walker = document.createTreeWalker(
+            rootEl,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode(node) {
+                    if (isSignatureOrQuoteNode(node)) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        const textNodes = [];
+        let n;
+        while ((n = walker.nextNode())) textNodes.push(n);
+        if (textNodes.length === 0) return [];
+
+        for (const node of textNodes) {
+            const val = node.nodeValue || "";
+            const idx = val.indexOf(original);
+            if (idx !== -1) {
+                const range = document.createRange();
+                range.setStart(node, idx);
+                range.setEnd(node, idx + original.length);
+                return [range];
+            }
+        }
+
+        const normOriginal = normalizeWhitespaceAndQuotes(original).trim();
+        for (const node of textNodes) {
+            const val = node.nodeValue || "";
+            const normVal = normalizeWhitespaceAndQuotes(val);
+            const idx = normVal.indexOf(normOriginal);
+            if (idx !== -1) {
+                const range = document.createRange();
+                range.setStart(node, idx);
+                range.setEnd(node, idx + normOriginal.length);
+                return [range];
+            }
+        }
+
+        let fullText = "";
+        const charMap = []; 
+        for (const node of textNodes) {
+            const val = node.nodeValue || "";
+            for (let i = 0; i < val.length; i++) {
+                charMap.push({ node, offset: i });
+            }
+            fullText += val;
+        }
+
+        let matchIdx = fullText.indexOf(original);
+        let matchLen = original.length;
+
+        if (matchIdx === -1) {
+            const normFull = normalizeWhitespaceAndQuotes(fullText);
+            matchIdx = normFull.indexOf(normOriginal);
+            matchLen = normOriginal.length;
+        }
+
+        if (matchIdx === -1) {
+            const lowerFull = normalizeWhitespaceAndQuotes(fullText).toLowerCase();
+            const lowerOrig = normOriginal.toLowerCase();
+            matchIdx = lowerFull.indexOf(lowerOrig);
+            matchLen = lowerOrig.length;
+        }
+
+        if (matchIdx !== -1 && matchIdx + matchLen <= charMap.length) {
+            const startPoint = charMap[matchIdx];
+            const endPoint = charMap[matchIdx + matchLen - 1];
+            const range = document.createRange();
+            range.setStart(startPoint.node, startPoint.offset);
+            range.setEnd(endPoint.node, endPoint.offset + 1);
+            return [range];
+        }
+
+        return [];
+    }
+
+    function getTextBoundingBoxes(el, searchStr) {
+        if (!el || !searchStr) return [];
+        
+        if (el.isContentEditable) {
+            const ranges = getRangesForContentEditable(el, searchStr);
+            const rects = [];
+            ranges.forEach(range => {
+                rects.push(...Array.from(range.getClientRects()));
+            });
+            return rects;
+        }
+        
+        const text = el.value || "";
+        const index = text.indexOf(searchStr);
+        if (index === -1) return [];
+        
+        const startCoord = getCaretCoordinates(el, index);
+        const endCoord = getCaretCoordinates(el, index + searchStr.length);
+        if (!startCoord || !endCoord) return [];
+        
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        const borderTop = parseFloat(style.borderTopWidth) || 0;
+        const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+        
+        return [{
+            left: rect.left + borderLeft - el.scrollLeft + startCoord.left,
+            top: rect.top + borderTop - el.scrollTop + startCoord.top,
+            width: endCoord.left - startCoord.left,
+            height: startCoord.height
+        }];
+    }
+
+    function getOrCreateOverlay() {
+        if (overlayCanvas && document.body.contains(overlayCanvas)) return overlayCanvas;
+        overlayCanvas = document.createElement("canvas");
+        overlayCanvas.id = "lexiconic-overlay-canvas";
+        overlayCanvas.style.position = "fixed";
+        overlayCanvas.style.pointerEvents = "none";
+        overlayCanvas.style.zIndex = "2147483646";
+        overlayCanvas.style.top = "0";
+        overlayCanvas.style.left = "0";
+        document.body.appendChild(overlayCanvas);
+        overlayCtx = overlayCanvas.getContext("2d");
+        return overlayCanvas;
+    }
+
+    function updateOverlayPosition() {
+        if (!activeElement || !overlayCanvas || currentCheckState.errors.length === 0) {
+            if (overlayCanvas && overlayCtx) {
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            }
+            return;
+        }
+        
+        const rect = activeElement.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0 || !isElementVisible(activeElement)) {
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            return;
+        }
+
+        overlayCanvas.style.top = `${rect.top}px`;
+        overlayCanvas.style.left = `${rect.left}px`;
+        overlayCanvas.style.width = `${rect.width}px`;
+        overlayCanvas.style.height = `${rect.height}px`;
+
+        const dpr = window.devicePixelRatio || 1;
+        overlayCanvas.width = rect.width * dpr;
+        overlayCanvas.height = rect.height * dpr;
+        
+        overlayCtx.scale(dpr, dpr);
+        drawSquiggles(rect);
+    }
+
+    function drawSquiggles(activeRect) {
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        
+        currentCheckState.errors.forEach(err => {
+            if (!err.original) return;
+            const rects = getTextBoundingBoxes(activeElement, err.original);
+            rects.forEach(r => {
+                const x = r.left - activeRect.left;
+                const y = r.top - activeRect.top;
+                const w = r.width;
+                const h = r.height;
+
+                if (y + h < 0 || y > activeRect.height || x + w < 0 || x > activeRect.width) return;
+
+                drawSquigglyLine(overlayCtx, x, y + h - 2, w);
+            });
+        });
+    }
+
+    function drawSquigglyLine(ctx, x, y, width) {
+        ctx.beginPath();
+        ctx.strokeStyle = "#E07A5F";
+        ctx.lineWidth = 1.5;
+        let currentX = x;
+        let up = true;
+        const step = 3;
+        const amplitude = 1.5;
+
+        ctx.moveTo(currentX, y);
+        while (currentX < x + width) {
+            currentX += step;
+            if (currentX > x + width) currentX = x + width;
+            ctx.lineTo(currentX, y + (up ? -amplitude : amplitude));
+            up = !up;
+        }
+        ctx.stroke();
+    }
+
     /* ── Badge Creation & Management ────────────────────────── */
 
     function getOrCreateBadge() {
@@ -487,6 +717,7 @@
         if (window.ResizeObserver) {
             resizeObserver = new ResizeObserver(() => {
                 updateBadgePosition();
+                updateOverlayPosition();
             });
             resizeObserver.observe(activeElement);
             if (activeElement.parentElement) {
@@ -495,12 +726,17 @@
         }
 
         getOrCreateBadge();
+        getOrCreateOverlay();
         updateBadgePosition();
+        updateOverlayPosition();
     }
 
     function hideBadge() {
         if (badgeElement) {
             badgeElement.style.display = "none";
+        }
+        if (overlayCanvas && overlayCtx) {
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
         }
         closeSuggestionPopup();
     }
@@ -519,7 +755,9 @@
 
         // Prevent clicks inside popup from stealing focus
         popup.addEventListener("mousedown", (e) => {
-            e.preventDefault();
+            if (e.target.tagName !== "SELECT" && e.target.tagName !== "OPTION") {
+                e.preventDefault();
+            }
         });
 
         // Header
@@ -586,9 +824,62 @@
         const footer = document.createElement("div");
         footer.className = "lexiconic-popup-footer";
 
+        const footerLeftWrap = document.createElement("div");
+        footerLeftWrap.className = "lexiconic-popup-footer-left";
+
         const footerLeft = document.createElement("span");
         footerLeft.className = "lexiconic-popup-status-pill";
         footerLeft.textContent = "Local & Private";
+
+        const toneSelect = document.createElement("select");
+        toneSelect.className = "lexiconic-footer-select";
+        toneSelect.title = "Writing Tone";
+        [
+            {val: "professional", label: "Professional"},
+            {val: "friendly", label: "Friendly"},
+            {val: "casual", label: "Casual"},
+            {val: "formal", label: "Formal"}
+        ].forEach(t => {
+            const opt = document.createElement("option");
+            opt.value = t.val;
+            opt.textContent = t.label;
+            toneSelect.appendChild(opt);
+        });
+
+        const styleSelect = document.createElement("select");
+        styleSelect.className = "lexiconic-footer-select";
+        styleSelect.title = "Writing Style";
+        [
+            {val: "natural", label: "Natural"},
+            {val: "simple", label: "Simple"},
+            {val: "concise", label: "Concise"},
+            {val: "polished", label: "Polished"}
+        ].forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.val;
+            opt.textContent = s.label;
+            styleSelect.appendChild(opt);
+        });
+
+        chrome.storage.local.get(["writingTone", "writingStyle"], (data) => {
+            if (data.writingTone) toneSelect.value = data.writingTone;
+            if (data.writingStyle) styleSelect.value = data.writingStyle;
+        });
+
+        const handleSelectChange = () => {
+            chrome.storage.local.set({
+                writingTone: toneSelect.value,
+                writingStyle: styleSelect.value
+            }, () => {
+                runGrammarCheck(true);
+            });
+        };
+        toneSelect.addEventListener("change", handleSelectChange);
+        styleSelect.addEventListener("change", handleSelectChange);
+
+        footerLeftWrap.appendChild(footerLeft);
+        footerLeftWrap.appendChild(toneSelect);
+        footerLeftWrap.appendChild(styleSelect);
 
         const fixAllBtn = document.createElement("button");
         fixAllBtn.className = "lexiconic-btn-fix-all";
@@ -601,7 +892,7 @@
             applyAllFixes();
         });
 
-        footer.appendChild(footerLeft);
+        footer.appendChild(footerLeftWrap);
         footer.appendChild(fixAllBtn);
 
         popup.appendChild(header);
@@ -723,6 +1014,7 @@
                     currentCheckState.errors = [];
                     updateBadgeCounter(0);
                 }
+                updateOverlayPosition();
                 renderPopupContent();
             }
         );
@@ -970,6 +1262,7 @@
         // Remove from list
         currentCheckState.errors.splice(index, 1);
         updateBadgeCounter(currentCheckState.errors.length);
+        updateOverlayPosition();
         renderPopupContent();
     }
 
@@ -993,12 +1286,14 @@
 
         currentCheckState.errors = [];
         updateBadgeCounter(0);
+        updateOverlayPosition();
         renderPopupContent();
     }
 
     function dismissSuggestion(index) {
         currentCheckState.errors.splice(index, 1);
         updateBadgeCounter(currentCheckState.errors.length);
+        updateOverlayPosition();
         renderPopupContent();
     }
 
@@ -1075,6 +1370,7 @@
                         currentCheckState.errors = [];
                         updateBadgeCounter(0);
                     }
+                    updateOverlayPosition();
                     if (popupElement && popupElement.style.display !== "none") {
                         renderPopupContent();
                     }
@@ -1084,8 +1380,14 @@
     }, true);
 
     // Keep badge aligned during window scroll and resize
-    window.addEventListener("scroll", updateBadgePosition, true);
-    window.addEventListener("resize", updateBadgePosition, true);
+    window.addEventListener("scroll", () => {
+        updateBadgePosition();
+        updateOverlayPosition();
+    }, true);
+    window.addEventListener("resize", () => {
+        updateBadgePosition();
+        updateOverlayPosition();
+    }, true);
 
     // Close popup and hide badge if user clicks outside of active input, badge, and popup
     document.addEventListener("pointerdown", (e) => {

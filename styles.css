@@ -463,6 +463,33 @@
     border-top: 1px solid var(--lex-border);
 }
 
+.lexiconic-popup-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lexiconic-footer-select {
+    background: var(--lex-bg-main);
+    border: 1px solid var(--lex-border);
+    border-radius: 4px;
+    font-size: 9.5px;
+    color: var(--lex-text-muted);
+    padding: 0 4px;
+    height: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.12s ease;
+}
+
+.lexiconic-footer-select:hover,
+.lexiconic-footer-select:focus {
+    border-color: var(--lex-gold-accent);
+    color: var(--lex-text-primary);
+    background: var(--lex-bg-card);
+}
+
 .lexiconic-popup-status-pill {
     font-size: 11px;
     font-weight: 500;

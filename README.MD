@@ -153,7 +153,6 @@ debounceTimer = setTimeout(() => {
 
 ## Roadmap
 
-- [ ] Add overlay canvas to draw red squiggly underlines directly over identified text offsets, similar to industry-leading products.
 - [ ] Options page to switch target Ollama models and endpoints (`http://localhost:11434`) via Chrome Storage.
 - [ ] Support custom tone preferences (e.g., Academic, Casual, Executive).
 - [ ] Ignore list for user-defined dictionaries and code blocks.
