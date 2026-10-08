@@ -3,20 +3,23 @@
 ## Store Listing Copy
 
 **Title:** Lexiconic - Local Grammar & Spellcheck
-**Short Description (132 chars):** Local grammar and spell checker powered by Ollama
+**Short Description (132 chars):** Private, local AI grammar checker. Fix typos and rewrite text anywhere you type online—from Gmail to Jira and beyond.
 
 **Detailed Description:**
-Lexiconic is a privacy-first, locally hosted spell and grammar checking Chrome extension. Powered by Ollama, it analyzes your text entirely on your device—no cloud services, no trackers, and no data leaves your computer.
+Write with confidence on any website while keeping your data entirely private.
+
+Lexiconic is a local grammar and spell checker that works wherever you type. Whether you are drafting an email in Gmail, updating tasks in Jira, writing a post on LinkedIn, or filling out a web form, Lexiconic catches your typos and polishes your sentences instantly.
+
+Powered by your local Ollama instance, Lexiconic processes your writing directly on your device. You get the benefits of an advanced writing assistant while keeping your personal text entirely offline.
 
 Features:
-- Instant grammar and spell checks on any webpage
-- Fully local and private analysis using Ollama models
-- Out-of-the-box support for Gemma 4 (gemma4:e4b)
-- Customize tone (e.g. professional, casual, friendly) and style (e.g. natural, concise)
-- Fix issues individually or apply all corrections with one click
-- Operates offline and guarantees complete data privacy
+- **Works Everywhere:** Analyzes text in Gmail, Notion, Slack, Jira, social media, and almost any web form.
+- **Complete Privacy:** Operates offline and keeps your data exclusively on your machine.
+- **Tone & Style Controls:** Rewrite sentences to sound professional, casual, concise, or friendly.
+- **Instant Fixes:** Accept individual suggestions or apply all corrections with one click.
+- **Local AI Powered:** Out-of-the-box support for Gemma 4 (gemma4:e4b) through Ollama.
 
-**Search Terms:** spellcheck, grammar, local ai, privacy, writing assistant
+**Search Terms:** spellcheck, grammar, local ai, privacy, writing assistant, email checker, ollama, rewrite
 
 ## Version History
 - **v0.1.3** (2026-10-06): Added overlay canvas for in-line red squiggly underlines on text offsets, and added tone and style quick-select dropdowns to the suggestion popup header for instant configuration.
